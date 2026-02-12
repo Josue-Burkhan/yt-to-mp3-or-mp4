@@ -46,7 +46,10 @@
                     </div>
                     <div class="input-group">
                         <label for="downloadPath">Base Download Folder</label>
-                        <input type="text" id="downloadPath" placeholder="~/Downloads">
+                        <div class="input-row">
+                            <input type="text" id="downloadPath" placeholder="~/Downloads">
+                            <button id="browseBtn" class="btn btn-primary" style="padding: 10px 14px;">📂</button>
+                        </div>
                         <p class="help-text">
                             Files will be saved in <b>/videos</b> and <b>/audios</b> subfolders inside this path.
                         </p>

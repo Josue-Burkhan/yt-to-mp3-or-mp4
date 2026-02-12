@@ -17,11 +17,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeSettings = document.getElementById('closeSettings');
     const saveSettings = document.getElementById('saveSettings');
     const downloadPathInput = document.getElementById('downloadPath');
+    const browseBtn = document.getElementById('browseBtn');
 
     let videoData = null;
 
     // Load settings on startup
     loadSettings();
+    startHeartbeat();
 
     // Toggle Settings Modal
     settingsBtn.addEventListener('click', () => {
@@ -36,6 +38,29 @@ document.addEventListener('DOMContentLoaded', () => {
     settingsModal.addEventListener('click', (e) => {
         if (e.target === settingsModal) {
             settingsModal.classList.add('hidden');
+        }
+    });
+
+    // Browse Folder
+    browseBtn.addEventListener('click', async () => {
+        const originalText = browseBtn.textContent;
+        browseBtn.textContent = '⏳';
+        browseBtn.disabled = true;
+
+        try {
+            const response = await fetch('/api/pick-folder');
+            const data = await response.json();
+
+            if (data.path) {
+                downloadPathInput.value = data.path;
+            } else if (data.error && data.error !== 'No folder selected') {
+                alert(`Error: ${data.error}`);
+            }
+        } catch (error) {
+            console.error('Failed to pick folder:', error);
+        } finally {
+            browseBtn.textContent = originalText;
+            browseBtn.disabled = false;
         }
     });
 
@@ -186,5 +211,13 @@ document.addEventListener('DOMContentLoaded', () => {
         statusDiv.textContent = message;
         statusDiv.className = `status ${type}`;
         statusDiv.classList.remove('hidden');
+    }
+
+    function startHeartbeat() {
+        setInterval(() => {
+            fetch('/api/heartbeat').catch(() => {
+                // Ignore errors (server might be down)
+            });
+        }, 2000);
     }
 });
