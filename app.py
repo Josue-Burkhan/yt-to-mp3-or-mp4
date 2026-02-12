@@ -1,3 +1,8 @@
+"""
+YouTube Downloader
+Author: Josue-Burkhan
+GitHub: https://github.com/Josue-Burkhan
+"""
 from flask import Flask, render_template, request, jsonify
 import yt_dlp
 import os

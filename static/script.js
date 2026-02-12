@@ -1,3 +1,7 @@
+/**
+ * YouTube Downloader Client Script
+ * Author: Josue-Burkhan
+ */
 document.addEventListener('DOMContentLoaded', () => {
     const urlInput = document.getElementById('url');
     const fetchInfoBtn = document.getElementById('fetchInfo');

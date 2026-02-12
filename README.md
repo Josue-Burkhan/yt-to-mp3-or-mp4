@@ -43,7 +43,7 @@ I've included "Launchers" that handle everything for you. They will automaticall
 
 ## 📸 Screenshots
 
-*(You can add screenshots here later)*
+![YouTube Downloader Interface](./screenshot.png)
 
 ---
 
@@ -53,7 +53,7 @@ For developers or those who prefer the command line:
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/yt-downloader.git
+git clone https://github.com/Josue-Burkhan/yt-downloader.git
 cd yt-downloader
 
 # Create Virtual Environment & Install Dependencies
@@ -76,5 +76,8 @@ This project is **Open Source (MIT License)**. You are free to modify, distribut
 ---
 
 <div align="center">
-Made with ❤️ by [Your Name/Handle]
+
+### Made with 💻 and ☕ by **[Josue-Burkhan](https://github.com/Josue-Burkhan)**  
+[![GitHub](https://img.shields.io/badge/GitHub-Josue--Burkhan-181717.svg?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Josue-Burkhan)
+
 </div>
