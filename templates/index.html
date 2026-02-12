@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Downloader</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="header-row">
+                <h1 class="title">
+                    <span class="icon">▶</span> YouTube Downloader
+                </h1>
+                <button id="settingsBtn" class="btn-icon" title="Settings">⚙️</button>
+            </div>
+
+            <!-- URL Input -->
+            <div class="input-group">
+                <label for="url">YouTube URL</label>
+                <div class="input-row">
+                    <input type="text" id="url" placeholder="https://www.youtube.com/watch?v=...">
+                    <button id="fetchInfo" class="btn btn-primary">Fetch</button>
+                </div>
+            </div>
+
+            <!-- Video Preview -->
+            <div id="videoPreview" class="video-preview hidden">
+                <img id="thumbnail" class="thumbnail hidden" alt="Thumbnail">
+                <div class="video-meta">
+                    <p id="videoTitle" class="video-title"></p>
+                    <p id="videoDuration" class="video-duration"></p>
+                </div>
+            </div>
+
+            <!-- Settings Modal -->
+            <div id="settingsModal" class="modal hidden">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>Settings</h2>
+                        <button id="closeSettings" class="btn-icon">✖</button>
+                    </div>
+                    <div class="input-group">
+                        <label for="downloadPath">Base Download Folder</label>
+                        <input type="text" id="downloadPath" placeholder="~/Downloads">
+                        <p class="help-text">
+                            Files will be saved in <b>/videos</b> and <b>/audios</b> subfolders inside this path.
+                        </p>
+                    </div>
+                    <div class="modal-actions">
+                        <button id="saveSettings" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Options -->
+            <div id="options" class="hidden">
+                <div class="options-row">
+                    <div class="input-group">
+                        <label for="format">Format</label>
+                        <select id="format">
+                            <option value="video">🎬 Video (MP4)</option>
+                            <option value="audio">🎵 Audio (MP3)</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group" id="qualityContainer">
+                        <label for="quality">Quality</label>
+                        <select id="quality"></select>
+                    </div>
+                </div>
+
+                <button id="downloadBtn" class="btn btn-download">
+                    ⬇ Download
+                </button>
+            </div>
+
+            <!-- Status -->
+            <div id="status" class="status hidden"></div>
+        </div>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+
+</html>
