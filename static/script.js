@@ -14,6 +14,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const thumbnailImg = document.getElementById('thumbnail');
     const videoTitle = document.getElementById('videoTitle');
     const videoDuration = document.getElementById('videoDuration');
+    const progressWrap = document.getElementById('progressWrap');
+    const progressText = document.getElementById('progressText');
+    const progressPercent = document.getElementById('progressPercent');
+    const progressFill = document.getElementById('progressFill');
+    const progressMeta = document.getElementById('progressMeta');
 
     // Settings elements
     const settingsBtn = document.getElementById('settingsBtn');
@@ -24,6 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const browseBtn = document.getElementById('browseBtn');
 
     let videoData = null;
+    let progressInterval = null;
 
     // Load settings on startup
     loadSettings();
@@ -185,6 +191,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const height = qualitySelect.value;
 
         showStatus('Downloading... this may take a moment ⏳', 'info');
+        startProgressPolling();
         downloadBtn.disabled = true;
         downloadBtn.classList.add('opacity-50', 'cursor-not-allowed');
 
@@ -201,11 +208,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error(data.error || 'Download failed');
             }
 
+            await fetchAndRenderProgress();
             showStatus(`✅ "${data.title}" - ${data.message}`, 'success');
 
         } catch (error) {
+            await fetchAndRenderProgress();
             showStatus(`❌ ${error.message}`, 'error');
         } finally {
+            stopProgressPolling();
             downloadBtn.disabled = false;
             downloadBtn.classList.remove('opacity-50', 'cursor-not-allowed');
         }
@@ -217,9 +227,78 @@ document.addEventListener('DOMContentLoaded', () => {
         statusDiv.classList.remove('hidden');
     }
 
+    function formatEta(seconds) {
+        if (typeof seconds !== 'number' || Number.isNaN(seconds) || seconds < 0) return null;
+        const mins = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${mins}:${String(secs).padStart(2, '0')}`;
+    }
+
+    function renderProgress(data) {
+        const status = data?.status || 'idle';
+        let percent = Number(data?.percent);
+        if (!Number.isFinite(percent)) percent = 0;
+        percent = Math.max(0, Math.min(100, Math.round(percent)));
+
+        if (status === 'idle') {
+            progressWrap.classList.add('hidden');
+            return;
+        }
+
+        progressWrap.classList.remove('hidden');
+        progressFill.style.width = `${percent}%`;
+        progressPercent.textContent = `${percent}%`;
+        progressText.textContent = data?.message || 'Downloading...';
+
+        const meta = [];
+        if (data?.downloaded && data?.total) {
+            meta.push(`${data.downloaded} / ${data.total}`);
+        }
+        if (data?.speed) {
+            meta.push(data.speed);
+        }
+        const etaText = formatEta(data?.eta);
+        if (etaText) {
+            meta.push(`ETA ${etaText}`);
+        }
+        progressMeta.textContent = meta.join(' • ');
+    }
+
+    async function fetchAndRenderProgress() {
+        try {
+            const response = await fetch('/api/progress');
+            if (!response.ok) return;
+            const data = await response.json();
+            renderProgress(data);
+        } catch (_) {
+            // Ignore progress fetch errors
+        }
+    }
+
+    function startProgressPolling() {
+        stopProgressPolling();
+        progressWrap.classList.remove('hidden');
+        progressFill.style.width = '0%';
+        progressPercent.textContent = '0%';
+        progressText.textContent = 'Starting download...';
+        progressMeta.textContent = '';
+        fetchAndRenderProgress();
+        progressInterval = setInterval(fetchAndRenderProgress, 1000);
+    }
+
+    function stopProgressPolling() {
+        if (progressInterval) {
+            clearInterval(progressInterval);
+            progressInterval = null;
+        }
+    }
+
     function startHeartbeat() {
         setInterval(() => {
-            fetch('/api/heartbeat').catch(() => {
+            fetch('/api/heartbeat', {
+                method: 'POST',
+                keepalive: true
+            }).catch(() => {
                 // Ignore errors (server might be down)
             });
         }, 2000);

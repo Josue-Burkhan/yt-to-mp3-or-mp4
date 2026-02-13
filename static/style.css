@@ -343,6 +343,47 @@ select {
     border: 1px solid rgba(108, 99, 255, 0.2);
 }
 
+/* Progress */
+.progress-wrap {
+    margin-top: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--input-border);
+    border-radius: 8px;
+    padding: 10px 12px;
+}
+
+.progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+}
+
+.progress-track {
+    width: 100%;
+    height: 8px;
+    background: #111117;
+    border: 1px solid var(--input-border);
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), #ff7a91);
+    transition: width 0.25s ease;
+}
+
+.progress-meta {
+    margin-top: 8px;
+    min-height: 18px;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+}
+
 /* Hidden utility */
 .hidden {
     display: none !important;

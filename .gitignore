@@ -5,3 +5,6 @@ __pycache__/
 temp_downloads/
 config.json
 .vscode/
+
+app.log
+app.log

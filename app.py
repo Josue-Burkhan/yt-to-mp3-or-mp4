@@ -24,17 +24,65 @@ DEFAULT_DOWNLOAD_DIR = os.path.join(os.path.expanduser('~'), 'Downloads')
 last_heartbeat = time.time()
 server_started = time.time()
 SHUTDOWN_GRACE_PERIOD = 60  # Seconds to wait for first connection
-HEARTBEAT_TIMEOUT = 10      # Seconds without heartbeat before shutdown
+HEARTBEAT_TIMEOUT = 60      # Seconds without heartbeat before shutdown
+downloads_lock = threading.Lock()
+active_downloads = 0
+progress_lock = threading.Lock()
+download_progress = {
+    'status': 'idle',
+    'percent': 0,
+    'message': '',
+    'eta': None,
+    'speed': None,
+    'downloaded': None,
+    'total': None,
+}
+
+def mark_activity():
+    global last_heartbeat
+    last_heartbeat = time.time()
+
+def has_active_downloads():
+    with downloads_lock:
+        return active_downloads > 0
+
+def set_download_progress(**kwargs):
+    with progress_lock:
+        download_progress.update(kwargs)
+
+def get_download_progress():
+    with progress_lock:
+        return dict(download_progress)
+
+def format_bytes(num_bytes):
+    if num_bytes is None:
+        return None
+    value = float(num_bytes)
+    units = ['B', 'KiB', 'MiB', 'GiB', 'TiB']
+    idx = 0
+    while value >= 1024 and idx < len(units) - 1:
+        value /= 1024
+        idx += 1
+    return f"{value:.1f} {units[idx]}"
+
+def format_speed(speed_bytes):
+    readable = format_bytes(speed_bytes)
+    if readable is None:
+        return None
+    return f"{readable}/s"
 
 def monitor_activity():
-    global last_heartbeat
     while True:
         time.sleep(2)
         now = time.time()
         # If server just started, give it grace period
         if now - server_started < SHUTDOWN_GRACE_PERIOD:
             continue
-        
+
+        # Keep server alive while a download is in progress.
+        if has_active_downloads():
+            continue
+
         # Check heartbeat
         if now - last_heartbeat > HEARTBEAT_TIMEOUT:
             print("No heartbeat detected. Shutting down server...")
@@ -59,15 +107,17 @@ def save_config(config):
 
 @app.route('/')
 def index():
-    global last_heartbeat
-    last_heartbeat = time.time()
+    mark_activity()
     return render_template('index.html')
 
-@app.route('/api/heartbeat', methods=['POST'])
+@app.route('/api/heartbeat', methods=['GET', 'POST'])
 def heartbeat():
-    global last_heartbeat
-    last_heartbeat = time.time()
+    mark_activity()
     return jsonify({'status': 'alive'})
+
+@app.route('/api/progress', methods=['GET'])
+def progress():
+    return jsonify(get_download_progress())
 
 @app.route('/api/pick-folder', methods=['GET'])
 def pick_folder():
@@ -126,8 +176,7 @@ def handle_settings():
 
 @app.route('/api/info', methods=['POST'])
 def get_info():
-    global last_heartbeat
-    last_heartbeat = time.time()
+    mark_activity()
     url = request.json.get('url')
     if not url:
         return jsonify({'error': 'URL is required'}), 400
@@ -165,8 +214,8 @@ def get_info():
 
 @app.route('/api/download', methods=['POST'])
 def download():
-    global last_heartbeat
-    last_heartbeat = time.time()
+    global active_downloads
+    mark_activity()
     data = request.json
     url = data.get('url')
     fmt = data.get('format')
@@ -187,12 +236,60 @@ def download():
         os.makedirs(target_dir)
 
     try:
+        with downloads_lock:
+            active_downloads += 1
+
+        set_download_progress(
+            status='downloading',
+            percent=0,
+            message='Starting download...',
+            eta=None,
+            speed=None,
+            downloaded=None,
+            total=None,
+        )
+
+        def progress_activity_hook(_):
+            mark_activity()
+
+        def progress_hook(data):
+            progress_activity_hook(data)
+            status = data.get('status')
+
+            if status == 'downloading':
+                downloaded_bytes = data.get('downloaded_bytes')
+                total_bytes = data.get('total_bytes') or data.get('total_bytes_estimate')
+                eta = data.get('eta')
+                speed = data.get('speed')
+                percent = 0
+                if total_bytes:
+                    percent = max(0, min(100, int((downloaded_bytes or 0) * 100 / total_bytes)))
+
+                set_download_progress(
+                    status='downloading',
+                    percent=percent,
+                    message='Downloading...',
+                    eta=eta,
+                    speed=format_speed(speed),
+                    downloaded=format_bytes(downloaded_bytes),
+                    total=format_bytes(total_bytes),
+                )
+            elif status == 'finished':
+                set_download_progress(
+                    status='processing',
+                    percent=100,
+                    message='Download complete. Processing file...',
+                    eta=0,
+                    speed=None,
+                )
+
         ydl_opts = {
             'nocheckcertificate': True,
             'noplaylist': True,
             'quiet': True,
             'paths': {'home': target_dir},
             'outtmpl': '%(title)s.%(ext)s',
+            'progress_hooks': [progress_hook],
         }
 
         if fmt == 'audio':
@@ -236,6 +333,14 @@ def download():
             info = ydl.extract_info(url, download=True)
             title = info.get('title', 'download')
 
+        set_download_progress(
+            status='success',
+            percent=100,
+            message=f'"{title}" downloaded successfully.',
+            eta=0,
+            speed=None,
+        )
+
         return jsonify({
             'success': True,
             'title': title,
@@ -243,7 +348,15 @@ def download():
         })
 
     except Exception as e:
+        set_download_progress(
+            status='error',
+            message=str(e),
+            speed=None,
+        )
         return jsonify({'error': str(e)}), 500
+    finally:
+        with downloads_lock:
+            active_downloads = max(0, active_downloads - 1)
 
 def open_browser():
     webbrowser.open_new('http://127.0.0.1:8000/')
@@ -251,4 +364,4 @@ def open_browser():
 if __name__ == '__main__':
     if not os.environ.get("WERKZEUG_RUN_MAIN"):
         threading.Timer(1, open_browser).start()
-    app.run(debug=True, port=8000)
+    app.run(debug=False, port=8000, threaded=True)
