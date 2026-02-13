@@ -33,9 +33,9 @@ body {
     color: var(--text);
     min-height: 100vh;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
-    padding: 20px;
+    padding: 24px 20px 28px;
     background-image:
         radial-gradient(ellipse at 20% 50%, rgba(108, 99, 255, 0.08) 0%, transparent 60%),
         radial-gradient(ellipse at 80% 20%, rgba(255, 59, 92, 0.06) 0%, transparent 60%);
@@ -43,7 +43,7 @@ body {
 
 .container {
     width: 100%;
-    max-width: 520px;
+    max-width: 760px;
 }
 
 /* Card */
@@ -51,7 +51,7 @@ body {
     background: var(--card-bg);
     border: 1px solid var(--card-border);
     border-radius: var(--radius);
-    padding: 32px;
+    padding: 28px;
     box-shadow: var(--shadow);
 }
 
@@ -60,7 +60,15 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 28px;
+    margin-bottom: 20px;
+}
+
+.toolbar-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 14px;
 }
 
 .title {
@@ -178,6 +186,27 @@ select {
     background: var(--primary-hover);
 }
 
+.btn-add-url {
+    min-width: 220px;
+    background: linear-gradient(135deg, #6c63ff, #8f89ff);
+    box-shadow: 0 6px 20px rgba(108, 99, 255, 0.28);
+}
+
+.btn-add-url:hover {
+    background: linear-gradient(135deg, #7a72ff, #9b95ff);
+}
+
+.btn-danger {
+    background: rgba(239, 68, 68, 0.16);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.25);
+    padding: 10px 12px;
+}
+
+.btn-danger:hover {
+    background: rgba(239, 68, 68, 0.25);
+}
+
 .btn-download {
     width: 100%;
     padding: 14px;
@@ -235,6 +264,117 @@ select {
     font-size: 0.75rem;
     color: var(--text-muted);
     margin-top: 4px;
+}
+
+.downloads-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.download-item {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--input-border);
+    border-radius: 10px;
+    padding: 14px;
+}
+
+.download-item-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.download-item-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+}
+
+.download-item-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.download-item-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 8px;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    border: 1px solid transparent;
+}
+
+.download-item-badge.hidden {
+    display: none !important;
+}
+
+.status-idle {
+    color: var(--text-muted);
+    border-color: rgba(152, 152, 166, 0.35);
+    background: rgba(152, 152, 166, 0.1);
+}
+
+.status-pending,
+.status-processing {
+    color: #a5a0ff;
+    border-color: rgba(108, 99, 255, 0.3);
+    background: rgba(108, 99, 255, 0.14);
+}
+
+.status-downloading {
+    color: #60a5fa;
+    border-color: rgba(96, 165, 250, 0.3);
+    background: rgba(96, 165, 250, 0.14);
+}
+
+.status-success {
+    color: #4ade80;
+    border-color: rgba(34, 197, 94, 0.3);
+    background: rgba(34, 197, 94, 0.14);
+}
+
+.status-error {
+    color: #f87171;
+    border-color: rgba(239, 68, 68, 0.3);
+    background: rgba(239, 68, 68, 0.14);
+}
+
+.btn-toggle {
+    padding: 7px 12px;
+    font-size: 0.8rem;
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text-muted);
+    border: 1px solid var(--input-border);
+}
+
+.btn-toggle:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text);
+}
+
+.download-item-summary {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--input-border);
+    border-radius: 8px;
+    padding: 8px 10px;
+}
+
+.download-item .status {
+    margin-top: 10px;
+}
+
+.download-item .progress-wrap {
+    margin-top: 10px;
 }
 
 /* Options row */
@@ -395,8 +535,16 @@ select {
         padding: 20px;
     }
 
+    .toolbar-row {
+        justify-content: center;
+    }
+
     .options-row {
         flex-direction: column;
+    }
+
+    .input-row {
+        flex-wrap: wrap;
     }
 
     .video-preview {

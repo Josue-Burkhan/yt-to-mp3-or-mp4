@@ -13,6 +13,14 @@
 
 ---
 
+## 🍎 Download macOS Installer
+
+[⬇️ Download `.dmg` (direct)](https://github.com/Josue-Burkhan/yt-to-mp3-or-mp4/raw/refs/heads/main/dist/YT%20to%20MP3%20or%20MP4.dmg)
+
+> If macOS blocks opening the app, right-click the app and choose **Open** the first time.
+
+---
+
 ## ✨ Features
 
 - **🎬 Full Quality**: Download videos from **144p up to 4K** (H.264 codec focused for compatibility).
@@ -53,8 +61,8 @@ For developers or those who prefer the command line:
 
 ```bash
 # Clone the repository
-git clone https://github.com/Josue-Burkhan/yt-downloader.git
-cd yt-downloader
+git clone https://github.com/Josue-Burkhan/yt-to-mp3-or-mp4.git
+cd yt-to-mp3-or-mp4
 
 # Create Virtual Environment & Install Dependencies
 python3 -m venv venv

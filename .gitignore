@@ -1,10 +1,20 @@
 venv/
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
+
 .DS_Store
-temp_downloads/
-config.json
 .vscode/
 
 app.log
-app.log
+*.log
+temp_downloads/
+config.json
+
+build/
+*.spec
+yt-to-mp3-4-icon.icns
+
+dist/*
+!dist/*.dmg

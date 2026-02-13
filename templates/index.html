@@ -19,22 +19,10 @@
                 <button id="settingsBtn" class="btn-icon" title="Settings">⚙️</button>
             </div>
 
-            <!-- URL Input -->
-            <div class="input-group">
-                <label for="url">YouTube URL</label>
-                <div class="input-row">
-                    <input type="text" id="url" placeholder="https://www.youtube.com/watch?v=...">
-                    <button id="fetchInfo" class="btn btn-primary">Fetch</button>
-                </div>
-            </div>
+            <div id="downloadsList" class="downloads-list"></div>
 
-            <!-- Video Preview -->
-            <div id="videoPreview" class="video-preview hidden">
-                <img id="thumbnail" class="thumbnail hidden" alt="Thumbnail">
-                <div class="video-meta">
-                    <p id="videoTitle" class="video-title"></p>
-                    <p id="videoDuration" class="video-duration"></p>
-                </div>
+            <div class="toolbar-row">
+                <button id="addUrlBtn" class="btn btn-primary btn-add-url">+ Add URL</button>
             </div>
 
             <!-- Settings Modal -->
@@ -59,45 +47,73 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
 
-            <!-- Options -->
-            <div id="options" class="hidden">
-                <div class="options-row">
+    <template id="downloadItemTemplate">
+        <div class="download-item">
+            <div class="download-item-header">
+                <div class="download-item-title-wrap">
+                    <span class="download-item-title">New download</span>
+                    <span class="download-item-badge status-idle hidden">Ready</span>
+                </div>
+                <button type="button" class="btn btn-toggle hidden">Expand</button>
+            </div>
+
+            <div class="download-item-summary hidden"></div>
+
+            <div class="download-item-body">
+                <div class="input-group">
+                    <label>YouTube URL</label>
+                    <div class="input-row">
+                        <input type="text" class="url-input" placeholder="https://www.youtube.com/watch?v=...">
+                        <button type="button" class="btn btn-primary fetch-info-btn">Fetch</button>
+                        <button type="button" class="btn btn-danger remove-item-btn" title="Remove item">✕</button>
+                    </div>
+                </div>
+
+                <div class="video-preview hidden">
+                    <img class="thumbnail hidden" alt="Thumbnail">
+                    <div class="video-meta">
+                        <p class="video-title"></p>
+                        <p class="video-duration"></p>
+                    </div>
+                </div>
+
+                <div class="options-row hidden">
                     <div class="input-group">
-                        <label for="format">Format</label>
-                        <select id="format">
+                        <label>Format</label>
+                        <select class="format-select">
                             <option value="video">🎬 Video (MP4)</option>
                             <option value="audio">🎵 Audio (MP3)</option>
                         </select>
                     </div>
 
-                    <div class="input-group" id="qualityContainer">
-                        <label for="quality">Quality</label>
-                        <select id="quality"></select>
+                    <div class="input-group quality-group">
+                        <label>Quality</label>
+                        <select class="quality-select">
+                            <option value="">Auto</option>
+                        </select>
                     </div>
                 </div>
 
-                <button id="downloadBtn" class="btn btn-download">
-                    ⬇ Download
-                </button>
-            </div>
+                <button type="button" class="btn btn-download download-btn hidden">⬇ Download</button>
 
-            <!-- Status -->
-            <div id="status" class="status hidden"></div>
+                <div class="status hidden"></div>
 
-            <!-- Download Progress -->
-            <div id="progressWrap" class="progress-wrap hidden">
-                <div class="progress-header">
-                    <span id="progressText">Downloading...</span>
-                    <span id="progressPercent">0%</span>
+                <div class="progress-wrap hidden">
+                    <div class="progress-header">
+                        <span class="progress-text">Downloading...</span>
+                        <span class="progress-percent">0%</span>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-fill"></div>
+                    </div>
+                    <div class="progress-meta"></div>
                 </div>
-                <div class="progress-track">
-                    <div id="progressFill" class="progress-fill"></div>
-                </div>
-                <div id="progressMeta" class="progress-meta"></div>
             </div>
         </div>
-    </div>
+    </template>
 
     <!-- Author Credits -->
     <div class="footer-credits">
