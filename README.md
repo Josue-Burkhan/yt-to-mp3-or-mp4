@@ -73,6 +73,18 @@ pip install -r requirements.txt
 python app.py
 ```
 
+## 📦 Creating a Standalone App (Mac)
+
+If you want to create a single **.dmg installer** that you can share with friends (no Python or FFmpeg installation required):
+
+1. Run the build script:
+   ```bash
+   bash build_mac.sh
+   ```
+2. Your installer will be at **`dist/YT-Downloader-Installer.dmg`**.
+   - **How to Install**: Open the `.dmg`, drag the app to your `Applications` folder (or run it directly).
+   - **Total Portability**: Includes FFmpeg built-in, so it works on any Mac "out of the box".
+
 ---
 
 ## ⚖️ Disclaimer & License

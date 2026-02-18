@@ -14,6 +14,7 @@ import subprocess
 import platform
 import uuid
 import sys
+import shutil
 
 APP_NAME = 'yt-to-mp3-or-mp4'
 
@@ -194,6 +195,46 @@ def get_target_dir(fmt):
     return target_dir
 
 
+    return target_dir
+
+
+def get_ffmpeg_path():
+    """Locate ffmpeg executable in predictable locations."""
+    # 1. Check if running from PyInstaller bundle
+    if getattr(sys, 'frozen', False):
+        bundle_dir = getattr(sys, '_MEIPASS', os.path.dirname(sys.executable))
+        bundled_ffmpeg = os.path.join(bundle_dir, 'ffmpeg')
+        if os.path.exists(bundled_ffmpeg):
+            return bundled_ffmpeg
+        if os.path.exists(bundled_ffmpeg + '.exe'):
+            return bundled_ffmpeg + '.exe'
+
+    # 2. Check system PATH (shutil.which)
+    path = shutil.which('ffmpeg')
+    if path:
+        return path
+
+    # 3. Check current working directory (e.g. if user put it there)
+    local_ffmpeg = os.path.join(os.getcwd(), 'ffmpeg')
+    if os.path.exists(local_ffmpeg):
+        return local_ffmpeg
+    if os.path.exists(local_ffmpeg + '.exe'):
+        return local_ffmpeg + '.exe'
+        
+    # 4. Check common macOS/Linux locations
+    common_paths = [
+        '/opt/homebrew/bin/ffmpeg',
+        '/usr/local/bin/ffmpeg',
+        '/usr/bin/ffmpeg',
+        '/var/lib/flatpak/exports/bin/ffmpeg' # Linux Flatpak
+    ] 
+    for p in common_paths:
+        if os.path.exists(p):
+            return p
+            
+    return None
+
+
 def build_ydl_options(fmt, height, target_dir, progress_hook):
     ydl_opts = {
         'nocheckcertificate': True,
@@ -203,6 +244,11 @@ def build_ydl_options(fmt, height, target_dir, progress_hook):
         'outtmpl': '%(title)s.%(ext)s',
         'progress_hooks': [progress_hook],
     }
+    
+    # Inject FFmpeg location
+    ffmpeg_loc = get_ffmpeg_path()
+    if ffmpeg_loc:
+        ydl_opts['ffmpeg_location'] = ffmpeg_loc
 
     if fmt == 'audio':
         ydl_opts.update({
